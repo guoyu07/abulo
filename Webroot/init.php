@@ -17,8 +17,6 @@ define('STORAGE_LOG_PATH', STORAGE_PATH.DS.'log');
 define('STORAGE_PID_PATH', STORAGE_PATH.DS.'pid');
 //定义 cache 目录
 define('STORAGE_CACHE_PATH', STORAGE_PATH.DS.'cache');
-//定义 swoole 日志目录
-define('STORAGE_SWOOLE_LOG_PATH', STORAGE_PATH.DS.'swoole');
 //定义 Kernel 目录
 define('KERNEL_PATH', dirname(WEBROOT_PATH).DS.'Kernel');
 // 定义Route目录
@@ -44,7 +42,6 @@ $paths = [
     STORAGE_LOG_PATH,
     STORAGE_PID_PATH,
     STORAGE_CACHE_PATH,
-    STORAGE_SWOOLE_LOG_PATH,
     ROUTE_PATH
 ];
 //创建必要目录
@@ -56,16 +53,12 @@ foreach ($paths as $path) {
 unset($paths, $path);
 //加载目录
 $classMap = KERNEL_PATH.DS.'ClassMap.php';
-$appClassMap = CONFIG_PATH.DS.'classmap.php';
+$appClassMap = CONFIG_PATH.DS.'ClassMap.php';
 $classMap = is_file($classMap) ? $classMap = include_once $classMap : [];
 $appClassMap = is_file($appClassMap) ? $appClassMap = include_once $appClassMap : [];
 
 $namespaces = array_merge($classMap['namespaces'], $appClassMap['namespaces']);
-foreach ($namespaces as $key => $path) {
-    if (!is_dir($path)) {
-        @mkdir($path, 0777, true);
-    }
-}
+
 $files = array_merge($classMap['files'], $appClassMap['files']);
 unset($classMap, $appClassMap);
 
