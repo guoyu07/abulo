@@ -24,6 +24,9 @@ return [
             'database'=>'loger',
             'collection'=>'loger',
         ],
+        'db' => [
+
+        ],
 
 
 
