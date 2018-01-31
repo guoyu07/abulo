@@ -17,8 +17,6 @@ define('STORAGE_PATH', WEBROOT_PATH.DS.'storage');
 define('STORAGE_LOG_PATH', STORAGE_PATH.DS.'log');
 //定义 pid 目录
 define('STORAGE_PID_PATH', STORAGE_PATH.DS.'pid');
-//定义 cache 目录
-define('STORAGE_CACHE_PATH', STORAGE_PATH.DS.'cache');
 //定义 task 目录
 define('STORAGE_TASK_PATH', STORAGE_PATH.DS.'task');
 //定义 Kernel 目录
@@ -34,10 +32,12 @@ define('ENV', 'development');
 //定义版本
 define('VERSION', '1.0.0');
 
-include_once KERNEL_PATH.DS.'Autoloader.php';
+define('BIN_DIR', WEBROOT_PATH.DS.'bin');
+
+
+
+include_once KERNEL_PATH.DS.'Helpers'.DS.'Autoloader.php';
 $classLoader = new Autoloader();
-
-
 
 $paths = [
     HTDOCS_PATH,
@@ -47,8 +47,9 @@ $paths = [
     STORAGE_PATH,
     STORAGE_LOG_PATH,
     STORAGE_PID_PATH,
-    STORAGE_CACHE_PATH,
-    ROUTE_PATH
+    STORAGE_TASK_PATH,
+    TPL_PATH
+    // ROUTE_PATH,
 ];
 //创建必要目录
 foreach ($paths as $path) {
@@ -58,7 +59,7 @@ foreach ($paths as $path) {
 }
 unset($paths, $path);
 //加载目录
-$classMap = KERNEL_PATH.DS.'ClassMap.php';
+$classMap = KERNEL_PATH.DS.'Helpers'.DS.'ClassMap.php';
 $appClassMap = CONFIG_PATH.DS.'ClassMap.php';
 $classMap = is_file($classMap) ? $classMap = include_once $classMap : [];
 $appClassMap = is_file($appClassMap) ? $appClassMap = include_once $appClassMap : [];
@@ -72,18 +73,16 @@ if ($appClassMap['namespaces']) {
 
 $files = array_merge($classMap['files'], $appClassMap['files']);
 
-
 if ($appClassMap['files']) {
     $files = array_merge($classMap['files'], $appClassMap['files']);
 } else {
     $files = $classMap['files'];
 }
 unset($classMap, $appClassMap);
-
 $classLoader->setPrefixes($namespaces);
 $classLoader->requireFiles($files);
 $classLoader->register();
 unset($namespaces, $files);
 
-\Kernel\Config\Config::init();
-\Kernel\Log\Logger::init();
+// \Kernel\Config\Config::init();
+// \Kernel\Log\Logger::init();

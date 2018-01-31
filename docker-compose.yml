@@ -1,16 +1,9 @@
 version: "2"
 services:
-    # 数据卷容器
-    dvc:
-        container_name: dvc
-        image: ubuntu:14.04
-        volumes:
-            - ./Kernel:/home/www/Kernel
-            - ./Webroot:/home/www/Webroot
-    # mongodb
     mongodb:
         image: "abulo/docker-mongodb:latest"
         container_name: mongodb
+        hostname: mongodb
         environment:
             - AUTH=yes
             - MONGODB_ADMIN_USER=admin
@@ -24,17 +17,17 @@ services:
             abulo:
                 ipv4_address: 172.18.1.2
         ulimits:
-            nproc: 65535
+            nproc: 1048576
         hostname: mongodb
         mem_limit: 512m
         restart: always
         volumes:
             - ./Docker/data/mongodb/:/data/db
             - ./Docker/config/hosts:/etc/hosts:ro
-    #mysql
     mysql:
         image: "abulo/docker-mysql:latest"
         container_name: mysql
+        hostname: mysql
         ports:
             - "33061:3306"
         networks:
@@ -55,6 +48,7 @@ services:
     redis:
         image: "redis:latest"
         container_name: redis
+        hostname: redis
         ports:
             - "63790:6379"
         networks:
@@ -71,36 +65,49 @@ services:
     #consul
     consul:
         image: consul
-        container_name: consul:1.0.3
+        container_name: consul
+        hostname: consul
         command: agent -ui -client 0.0.0.0 -server -bootstrap-expect 1
+        ports:
+            - "18500:8500"
         networks:
             abulo:
                 ipv4_address: 172.18.1.5
-        ports:
-            - "18500:8500"
         volumes:
             - ./Docker/config/hosts:/etc/hosts:ro
-    #swoole1
     swoole1:
-        container_name: swoole1
         image: "abulo/docker-php:latest"
-        environment:
-            SD_NODE_NAME: "SD-1"
-        volumes_from:
-            - dvc
-        links:
-            - consul
-            - mysql
-            - redis
-            - mongodb
+        container_name: swoole1
         ports:
-            - "11001:8081"
-        volumes:
-            - ./Docker/config/php/php.ini:/usr/local/php/etc/php.ini:ro
-            - ./Docker/config/hosts:/etc/hosts:ro
+            - "9091:9091"
+            - "8081:8081"
+            - "8083:8083"
+            - "9999:9999"
         networks:
             abulo:
                 ipv4_address: 172.18.1.6
+        ulimits:
+            nproc: 65535
+        hostname: swoole1
+        mem_limit: 512m
+        environment:
+            SD_NODE_NAME: "SD-1"
+        depends_on:
+            - mongodb
+            - mysql
+            - redis
+            - consul
+        volumes:
+            - ./Docker/config/php/php.ini:/usr/local/php/etc/php.ini:ro
+            - ./Docker/config/hosts:/etc/hosts:ro
+            - ./Kernel:/home/www/Kernel
+            - ./Webroot:/home/www/Webroot
+        links:
+            - mongodb
+            - mysql
+            - redis
+            - consul
+        command: ["php","/home/www/Webroot/launch/http.php","start"]
 networks:
     abulo:
         driver: bridge
