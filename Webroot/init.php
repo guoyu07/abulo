@@ -32,7 +32,7 @@ define('ENV', 'development');
 //定义版本
 define('VERSION', '1.0.0');
 
-define('BIN_DIR', WEBROOT_PATH.DS.'bin');
+define('BIN_DIR', dirname(WEBROOT_PATH).DS.'bin');
 
 
 

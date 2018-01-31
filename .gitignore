@@ -2,3 +2,5 @@
 /Docker/data
 .DS_Store
 /Webroot/storage
+/bin/exec/consul
+/bin/exec/consul.d
