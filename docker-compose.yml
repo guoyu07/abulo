@@ -83,6 +83,8 @@ services:
             - "8081:8081"
             - "8083:8083"
             - "9999:9999"
+            - "18000:18000"
+            - "18083:18083"
         networks:
             abulo:
                 ipv4_address: 172.18.1.6
@@ -102,6 +104,43 @@ services:
             - ./Docker/config/hosts:/etc/hosts:ro
             - ./Kernel:/home/www/Kernel
             - ./Webroot:/home/www/Webroot
+            - ./bin:/home/www/bin
+        links:
+            - mongodb
+            - mysql
+            - redis
+            - consul
+        command: ["php","/home/www/Webroot/launch/http.php","start"]
+    swoole2:
+        image: "abulo/docker-php:latest"
+        container_name: swoole2
+        ports:
+            - "29091:9091"
+            - "28081:8081"
+            - "38083:8083"
+            - "29999:9999"
+            - "28000:18000"
+            - "28083:18083"
+        networks:
+            abulo:
+                ipv4_address: 172.18.1.7
+        ulimits:
+            nproc: 65535
+        hostname: swoole2
+        mem_limit: 512m
+        environment:
+            SD_NODE_NAME: "SD-2"
+        depends_on:
+            - mongodb
+            - mysql
+            - redis
+            - consul
+        volumes:
+            - ./Docker/config/php/php.ini:/usr/local/php/etc/php.ini:ro
+            - ./Docker/config/hosts:/etc/hosts:ro
+            - ./Kernel:/home/www/Kernel
+            - ./Webroot:/home/www/Webroot
+            - ./bin:/home/www/bin
         links:
             - mongodb
             - mysql

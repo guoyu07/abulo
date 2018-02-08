@@ -101,25 +101,66 @@ return [
 
     'redis' => [
         'enable'=> true,
-        'active'=> 'local',
+        'active'=> 'local,lock',
         /**
          * 本地环境
          */
         'local'=>[
             'ip'=> '172.18.1.4',
             'port'=> 6379,
-            'select'=> 1,
+            // 'select'=> 1,
+            // 'password'=> '123456',
+        ],
+        'lock'=>[
+            'ip'=> '172.18.1.4',
+            'port'=> 6379,
+            // 'select'=> 1,
             // 'password'=> '123456',
         ],
         'asyn_max_count'=> 10,
+    ],
+
+    //redis 集群服务
+    'redis_proxy'=>[
+        'active'=>'pools,pools1,session',
+        'pools' => [
+            'local','lock'
+        ],
+        'pools1' => [
+            'local','lock'
+        ],
+        'session' =>[
+            'local','lock'
+        ],
+    ],
+
+
+    'mysql_proxy' =>[
+        'active'=>'ott,user',
+        'ott'=>[
+            'master' => 'test',
+            'slave' => ['test','test1'],
+        ],
+        'user'=>[
+            'master' => 'test',
+            'slave' => ['test','test1'],
+        ],
     ],
 
 
     'mysql' =>[
 
         'enable'=> true,
-        'active'=> 'test',
+        'active'=> 'test,test1',
         'test'=>[
+            'host'=> '172.18.1.3',
+            'port'=> 3306,
+            'user'=> 'root',
+            'password'=> 'mysql',
+            'database'=> 'one',
+            'charset'=> 'utf8mb4',
+        ],
+        'test1'=>[
             'host'=> '172.18.1.3',
             'port'=> 3306,
             'user'=> 'root',
@@ -217,4 +258,19 @@ return [
         //TCP集群端口
         'port'=>9999
     ],
+
+
+
+
+    'backstage'=>[
+        'bin_path'=>BIN_DIR.DS.'exec'.DS.'backstage',
+        //是否启用backstage
+        'enable' => true,
+        //web页面访问端口
+        'port' => 18000,
+        //提供的ws端口
+        'socket' => "0.0.0.0",
+        'websocket_port' => 18083,
+    ],
+
 ];
